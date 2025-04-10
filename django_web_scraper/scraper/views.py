@@ -128,7 +128,7 @@ def scrape_website(request):
             # Prepare context for rendering
             context = {
                 'website': {
-                    'id': website.id,  # Added this line
+                    'id': website.id, 
                     'url': url,
                     'title': title,
                     'description': description,
