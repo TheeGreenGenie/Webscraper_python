@@ -190,4 +190,90 @@
                                placeholder="example.com" required>
                     </div>
                     <div class="form-text mb-4">
-                        <i class="fas fa-info-circle me-1"></i> You can
+                        <i class="fas fa-info-circle me-1"></i> You can enter a URL with or without http:// or https://
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary submit-btn pulse-animation">
+                            <i class="fas fa-search"></i> Scrape Website
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="features-section">
+    <h3 class="features-title">Features</h3>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <h4 class="feature-title">Metadata Extraction</h4>
+                <p>Extract essential information such as title, description, keywords, and author from any website.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-images"></i>
+                </div>
+                <h4 class="feature-title">Image Collection</h4>
+                <p>Automatically collect and display up to 50 images from the target website for easy browsing.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-download"></i>
+                </div>
+                <h4 class="feature-title">Bulk Download</h4>
+                <p>Download individual images or get all images at once in a convenient ZIP archive.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlInput = document.getElementById('url');
+        
+        // Focus on URL input when page loads
+        urlInput.focus();
+        
+        // Form validation and animation
+        const form = document.getElementById('scrape-form');
+        form.addEventListener('submit', function(e) {
+            let url = urlInput.value.trim();
+            
+            // Basic URL validation
+            if (url !== '' && !url.includes('.')) {
+                e.preventDefault();
+                urlInput.classList.add('is-invalid');
+                
+                // Create error message if not exists
+                if (!document.querySelector('.invalid-feedback')) {
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'invalid-feedback';
+                    errorMsg.textContent = 'Please enter a valid website URL';
+                    urlInput.parentNode.appendChild(errorMsg);
+                }
+                
+                return false;
+            }
+            
+            // Show loading spinner
+            document.getElementById('loading-spinner').style.display = 'flex';
+        });
+        
+        // Remove invalid class on input
+        urlInput.addEventListener('input', function() {
+            urlInput.classList.remove('is-invalid');
+        });
+    });
+</script>
+{% endblock %}
