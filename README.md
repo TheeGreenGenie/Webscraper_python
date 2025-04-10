@@ -134,22 +134,11 @@ When you're ready to deploy the application:
    - Set up a production database
 
 2. Collect static files:
-   ```bash
+
    python manage.py collectstatic
-   ```
+
 
 3. Consider using:
    - Gunicorn or uWSGI as the application server
    - Nginx or Apache as the web server
    - PostgreSQL as the database
-
-## Contributing
-
-If you'd like to contribute to this project:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Commit your changes (`git commit -m 'Add some amazing feature'`)
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
