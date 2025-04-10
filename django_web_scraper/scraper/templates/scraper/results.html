@@ -1,58 +1,295 @@
+{% comment %}templates/scraper/results.html{% endcomment %}
 {% extends 'scraper/base.html' %}
 
 {% block title %}Scraping Results - {{ website.title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    .website-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+    }
+    
+    .website-url {
+        font-size: 1rem;
+        color: var(--gray-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    .website-url a {
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    
+    .website-url a:hover {
+        color: var(--secondary-color);
+        text-decoration: underline;
+    }
+    
+    .metadata-card {
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .metadata-item {
+        margin-bottom: 1.5rem;
+    }
+    
+    .metadata-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .metadata-label {
+        display: inline-block;
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        background-color: rgba(67, 97, 238, 0.1);
+    }
+    
+    .metadata-content {
+        padding: 0.75rem;
+        background-color: white;
+        border-radius: 6px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .image-count-badge {
+        background-color: var(--primary-color);
+        color: white;
+        font-size: 0.9rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 30px;
+        margin-left: 0.75rem;
+    }
+    
+    .image-item {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        padding: 0;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .image-preview-container {
+        position: relative;
+        padding-top: 75%; /* 4:3 Aspect Ratio */
+        overflow: hidden;
+        background-color: #f8f9fa;
+    }
+    
+    .image-preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 1rem;
+    }
+    
+    .image-details {
+        padding: 0.75rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .image-filename {
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        word-break: break-all;
+    }
+    
+    .action-bar {
+        margin-top: auto;
+        text-align: center;
+    }
+    
+    .download-btn {
+        width: 100%;
+        padding: 0.35rem 0;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    
+    .download-btn i {
+        margin-right: 0.35rem;
+    }
+    
+    .download-all-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(75, 181, 67, 0.2);
+    }
+    
+    .download-all-btn i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .info-card {
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 1.5rem;
+    }
+    
+    .action-button {
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .action-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: all 0.6s;
+        z-index: -1;
+    }
+    
+    .action-button:hover::before {
+        left: 100%;
+    }
+    
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .breadcrumb-item a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item.active {
+        color: var(--gray-color);
+    }
+    
+    .no-images-container {
+        text-align: center;
+        padding: 3rem 0;
+    }
+    
+    .no-images-icon {
+        font-size: 4rem;
+        color: var(--light-gray-color);
+        margin-bottom: 1rem;
+    }
+    
+    .no-images-text {
+        font-size: 1.2rem;
+        color: var(--gray-color);
+        margin-bottom: 0;
+    }
+    
+    /* Image hover effect */
+    .image-item:hover .image-preview {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row">
+<!-- Breadcrumb navigation -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}"><i class="fas fa-home"></i> Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Scraping Results</li>
+    </ol>
+</nav>
+
+<!-- Website information section -->
+<div class="website-title">{{ website.title }}</div>
+<div class="website-url">
+    <i class="fas fa-link"></i> <a href="{{ website.url }}" target="_blank" rel="noopener noreferrer">{{ website.url }}</a>
+</div>
+
+<div class="row g-4">
+    <!-- Metadata section -->
     <div class="col-12">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h2>Website Information</h2>
+        <div class="card mb-4 metadata-card">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-info-circle me-2"></i>
+                <h2 class="section-title mb-0">Website Metadata</h2>
             </div>
             <div class="card-body">
-                <div class="mb-3">
-                    <h3>{{ website.title }}</h3>
-                    <p><strong>URL:</strong> <a href="{{ website.url }}" target="_blank">{{ website.url }}</a></p>
-                </div>
-                
-                <div class="mb-3">
-                    <h4>Metadata</h4>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <p><strong>Description:</strong></p>
+                <div class="row">
+                    <!-- Description -->
+                    <div class="col-md-12 metadata-item">
+                        <div class="metadata-label">
+                            <i class="fas fa-file-alt me-1"></i> Description
                         </div>
-                        <div class="col-md-8">
-                            <p>{{ website.description }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-4">
-                            <p><strong>Keywords:</strong></p>
-                        </div>
-                        <div class="col-md-8">
-                            <p>{{ website.keywords }}</p>
+                        <div class="metadata-content">
+                            {% if website.description != 'No description found' %}
+                                <p class="mb-0">{{ website.description }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0"><i>No description provided by the website</i></p>
+                            {% endif %}
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-4">
-                            <p><strong>Author:</strong></p>
+                    <!-- Keywords -->
+                    <div class="col-md-12 metadata-item">
+                        <div class="metadata-label">
+                            <i class="fas fa-tags me-1"></i> Keywords
                         </div>
-                        <div class="col-md-8">
-                            <p>{{ website.author }}</p>
+                        <div class="metadata-content">
+                            {% if website.keywords != 'No keywords found' %}
+                                <p class="mb-0">{{ website.keywords }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0"><i>No keywords provided by the website</i></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Author -->
+                    <div class="col-md-12 metadata-item">
+                        <div class="metadata-label">
+                            <i class="fas fa-user me-1"></i> Author
+                        </div>
+                        <div class="metadata-content">
+                            {% if website.author != 'No author found' %}
+                                <p class="mb-0">{{ website.author }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0"><i>No author information provided by the website</i></p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
+        <!-- Images section -->
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h2>Images ({{ image_count }})</h2>
+                <div>
+                    <i class="fas fa-images me-2"></i>
+                    <h2 class="section-title d-inline-block mb-0">Images</h2>
+                    <span class="image-count-badge">{{ image_count }}</span>
+                </div>
                 {% if image_count > 0 %}
-                <a href="{% url 'download_all_images' website_id=website.id %}" class="btn btn-success">
-                    Download All Images
+                <a href="{% url 'download_all_images' website_id=website.id %}" class="btn btn-success download-all-btn action-button">
+                    <i class="fas fa-download"></i> Download All Images
                 </a>
                 {% endif %}
             </div>
@@ -62,26 +299,57 @@
                     <div class="image-container">
                         {% for image in images %}
                         <div class="image-item">
-                            <img src="{{ image.data }}" alt="{{ image.alt_text }}" class="image-preview">
-                            <p class="text-truncate" title="{{ image.filename }}">{{ image.filename }}</p>
-                            <a href="{% url 'download_image' image_id=image.id %}" class="btn btn-sm btn-primary">
-                                Download
-                            </a>
+                            <div class="image-preview-container">
+                                <img src="{{ image.data }}" alt="{{ image.alt_text }}" class="image-preview">
+                            </div>
+                            <div class="image-details">
+                                <p class="image-filename text-truncate" title="{{ image.filename }}">
+                                    <i class="fas fa-file-image text-primary me-1"></i> {{ image.filename }}
+                                </p>
+                                <div class="action-bar">
+                                    <a href="{% url 'download_image' image_id=image.id %}" class="btn btn-sm btn-primary download-btn">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
                 {% else %}
-                <div class="alert alert-info">
-                    No Images
+                <div class="no-images-container">
+                    <i class="fas fa-image-slash no-images-icon"></i>
+                    <p class="no-images-text">No Images Available</p>
+                    <p class="text-muted">The website doesn't contain any images or they couldn't be processed.</p>
                 </div>
                 {% endif %}
             </div>
         </div>
         
-        <div class="mt-4">
-            <a href="{% url 'index' %}" class="btn btn-secondary">Scrape Another Website</a>
+        <div class="mt-4 text-center">
+            <a href="{% url 'index' %}" class="btn btn-secondary action-button">
+                <i class="fas fa-search me-2"></i> Scrape Another Website
+            </a>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth reveal animation to images
+        const imageItems = document.querySelectorAll('.image-item');
+        imageItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            
+            setTimeout(() => {
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, 100 + (index * 50)); // Staggered animation
+        });
+    });
+</script>
 {% endblock %}

@@ -1,37 +1,193 @@
+{% comment %}templates/scraper/index.html{% endcomment %}
 {% extends 'scraper/base.html' %}
 
 {% block title %}Website Scraper{% endblock %}
 
+{% block extra_css %}
+<style>
+    .hero-section {
+        text-align: center;
+        padding: 2rem 0 3rem;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--dark-color);
+        background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+        color: var(--gray-color);
+        margin-bottom: 2.5rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .form-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .form-card .card-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+    
+    .form-card .card-header h2 {
+        color: white;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .form-card .card-body {
+        padding: 2rem;
+    }
+    
+    .url-input-group {
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    
+    .url-input {
+        border: none;
+        padding: 1rem 1.25rem;
+        font-size: 1.1rem;
+        box-shadow: none !important;
+    }
+    
+    .url-input:focus {
+        border: none;
+    }
+    
+    .url-addon {
+        background-color: rgba(67, 97, 238, 0.1);
+        color: var(--primary-color);
+        border: none;
+        font-weight: 500;
+        padding: 0 1.25rem;
+    }
+    
+    .submit-btn {
+        padding: 0.75rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+    }
+    
+    .submit-btn i {
+        margin-right: 0.5rem;
+    }
+    
+    .features-section {
+        margin-top: 4rem;
+        margin-bottom: 2rem;
+    }
+    
+    .features-title {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .feature-card {
+        height: 100%;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        border-top: 4px solid var(--primary-color);
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    
+    .feature-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        margin-bottom: 1.25rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border-radius: 12px;
+        font-size: 1.5rem;
+    }
+    
+    .feature-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--dark-color);
+    }
+    
+    .error-alert {
+        border-left: 4px solid var(--danger-color);
+        background-color: rgba(220, 53, 69, 0.1);
+        color: var(--danger-color);
+    }
+    
+    /* Animation for the submit button */
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(67, 97, 238, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+    }
+    
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">Website Metadata Scraper</h1>
+    <p class="hero-subtitle">Extract essential information and images from any website with just one click. Our tool analyzes metadata and collects up to 50 images for you to download.</p>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
+    <div class="col-md-8 col-lg-7">
+        <div class="card form-card animate-fade-in">
             <div class="card-header">
-                <h2 class="text-center">Website Metadata Scraper</h2>
+                <h2><i class="fas fa-spider me-2"></i> Scrape a Website</h2>
             </div>
             <div class="card-body">
-                <p class="text-center">Enter a URL to scrape its metadata and images (up to 50).</p>
-                
                 {% if error %}
-                <div class="alert alert-danger">
-                    {{ error }}
+                <div class="alert error-alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> {{ error }}
                 </div>
                 {% endif %}
                 
-                <form method="post" action="{% url 'scrape_website' %}">
+                <form method="post" action="{% url 'scrape_website' %}" id="scrape-form">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="url" class="form-label">Website URL</label>
-                        <input type="text" class="form-control" id="url" name="url" 
-                               placeholder="Enter URL (e.g., example.com)" required>
-                        <div class="form-text">You can enter a URL with or without http:// or https://</div>
+                    <label for="url" class="form-label">Enter the website URL you want to analyze</label>
+                    <div class="input-group url-input-group">
+                        <span class="input-group-text url-addon"><i class="fas fa-globe"></i></span>
+                        <input type="text" class="form-control url-input" id="url" name="url" 
+                               placeholder="example.com" required>
                     </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Scrape Website</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+                    <div class="form-text mb-4">
+                        <i class="fas fa-info-circle me-1"></i> You can
