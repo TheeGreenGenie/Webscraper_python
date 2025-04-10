@@ -1,0 +1,37 @@
+{% extends 'scraper/base.html' %}
+
+{% block title %}Website Scraper{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center">Website Metadata Scraper</h2>
+            </div>
+            <div class="card-body">
+                <p class="text-center">Enter a URL to scrape its metadata and images (up to 50).</p>
+                
+                {% if error %}
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
+                {% endif %}
+                
+                <form method="post" action="{% url 'scrape_website' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="url" class="form-label">Website URL</label>
+                        <input type="text" class="form-control" id="url" name="url" 
+                               placeholder="Enter URL (e.g., example.com)" required>
+                        <div class="form-text">You can enter a URL with or without http:// or https://</div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Scrape Website</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

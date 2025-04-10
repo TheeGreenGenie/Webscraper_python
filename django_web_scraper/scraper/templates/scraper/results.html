@@ -1,0 +1,87 @@
+{% extends 'scraper/base.html' %}
+
+{% block title %}Scraping Results - {{ website.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Website Information</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h3>{{ website.title }}</h3>
+                    <p><strong>URL:</strong> <a href="{{ website.url }}" target="_blank">{{ website.url }}</a></p>
+                </div>
+                
+                <div class="mb-3">
+                    <h4>Metadata</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Description:</strong></p>
+                        </div>
+                        <div class="col-md-8">
+                            <p>{{ website.description }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Keywords:</strong></p>
+                        </div>
+                        <div class="col-md-8">
+                            <p>{{ website.keywords }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Author:</strong></p>
+                        </div>
+                        <div class="col-md-8">
+                            <p>{{ website.author }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2>Images ({{ image_count }})</h2>
+                {% if image_count > 0 %}
+                <a href="{% url 'download_all_images' website_id=website.id %}" class="btn btn-success">
+                    Download All Images
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if image_count > 0 %}
+                <div class="image-gallery">
+                    <div class="image-container">
+                        {% for image in images %}
+                        <div class="image-item">
+                            <img src="{{ image.data }}" alt="{{ image.alt_text }}" class="image-preview">
+                            <p class="text-truncate" title="{{ image.filename }}">{{ image.filename }}</p>
+                            <a href="{% url 'download_image' image_id=image.id %}" class="btn btn-sm btn-primary">
+                                Download
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    No Images
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{% url 'index' %}" class="btn btn-secondary">Scrape Another Website</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
